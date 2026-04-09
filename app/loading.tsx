@@ -80,8 +80,17 @@ export default function LoadingScreen() {
     const PawComp = useMemo(() => resolveSvgComponent(pawMod), [pawMod]);
     const CushionComp = useMemo(() => resolveSvgComponent(cushionMod), [cushionMod]);
 
+    const [loadingDots, setLoadingDots] = useState<1 | 2 | 3>(1);
+
     // 0..1 loop: controls sequential paw reveal
     const pawProgress = useSharedValue(0);
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            setLoadingDots((d) => ((d % 3) + 1) as 1 | 2 | 3);
+        }, 350);
+        return () => clearInterval(id);
+    }, []);
 
     useEffect(() => {
         // Native might need to download assets to get localUri.
@@ -158,7 +167,7 @@ export default function LoadingScreen() {
                         },
                     ]}
                 >
-                    Loading . . .
+                    {`loading${'.'.repeat(loadingDots)}`}
                 </ThemedText>
 
                 {/* paw: 아래에서부터 차례대로 */}
