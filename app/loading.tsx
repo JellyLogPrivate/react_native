@@ -3,15 +3,15 @@ import { StyleSheet, View, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Asset } from 'expo-asset';
-import { SvgUri } from 'react-native-svg';
 import Animated, {
-  Extrapolation,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
+    Extrapolation,
+    interpolate,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withTiming,
 } from 'react-native-reanimated';
+import { SvgUri } from 'react-native-svg';
 
 const DESIGN_W = 402;
 const DESIGN_H = 874;
