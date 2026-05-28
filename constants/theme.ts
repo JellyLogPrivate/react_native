@@ -5,33 +5,36 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-const main1Color = '#FFFCF5';
-const main2Color = '#FDFDFD';
-const sub1Color = '#B39C8D';
-const sub2Color = '#7B7876';
-const sub2_2Color = '#E4E3E3';
-const growthColor = '#B0F398';
-const heart1Color = '#FFCED0';
-const heart2Color = '#F3989C';
+export const DefaultTheme = {
+    tintColorLight: '#0a7ea4',
+    tintColorDark: '#fff',
+    main1Color: '#FFFCF5',
+    main2Color: '#FDFDFD',
+    sub1Color: '#B39C8D',
+    sub2Color: '#7B7876',
+    sub2_2Color: '#E4E3E3',
+    growthColor: '#B0F398',
+    heart1Color: '#FFCED0',
+    heart2Color: '#F3989C',
+    backGroundColor: '#FFFEFA',
+};
 
 export const Colors = {
     light: {
         text: '#11181C',
-        background: '#fff',
-        tint: tintColorLight,
+        background: DefaultTheme.backGroundColor,
+        tint: DefaultTheme.tintColorLight,
         icon: '#687076',
         tabIconDefault: '#687076',
-        tabIconSelected: tintColorLight,
+        tabIconSelected: DefaultTheme.tintColorLight,
     },
     dark: {
         text: '#ECEDEE',
-        background: '#151718',
-        tint: tintColorDark,
+        background: DefaultTheme.backGroundColor,
+        tint: DefaultTheme.tintColorDark,
         icon: '#9BA1A6',
         tabIconDefault: '#9BA1A6',
-        tabIconSelected: tintColorDark,
+        tabIconSelected: DefaultTheme.tintColorDark,
     },
 };
 
