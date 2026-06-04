@@ -157,18 +157,6 @@ export default function LoadingScreen() {
         };
     }, [cushionMod]);
 
-    useEffect(() => {
-        pawProgress.value = 0;
-
-        pawProgress.value = withRepeat(
-            withTiming(1, {
-                duration: 1200,
-            }),
-            -1,
-            false
-        );
-    }, [pawProgress]);
-
     const usePawStyle = (index: 0 | 1 | 2 | 3) =>
         useAnimatedStyle(() => {
             const start = index * 0.2;

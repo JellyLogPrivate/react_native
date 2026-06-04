@@ -23,13 +23,6 @@ export default function RootLayout() {
                 <Stack.Screen name="index" />
                 <Stack.Screen name="loading" />
                 <Stack.Screen name="(tabs)" />
-
-                <Stack.Screen
-                    name="modal"
-                    options={{
-                        presentation: 'modal',
-                    }}
-                />
             </Stack>
 
             <StatusBar style="auto" />
