@@ -1,26 +1,29 @@
 import { Tabs } from 'expo-router';
 
-import { CustomTabBar } from '@/components/customTabBar';
+import { AppTabBar } from '@/components/layout/app-tab-bar';
+import { AppStateProvider } from '@/contexts/app-state-context';
 
 export default function TabLayout() {
     return (
-        <Tabs
-            screenOptions={{
-                headerShown: false,
-            }}
-            tabBar={(props) => <CustomTabBar {...props} />}
-        >
-            <Tabs.Screen
-                name="index"
-                options={{
-                    href: null,
+        <AppStateProvider>
+            <Tabs
+                screenOptions={{
+                    headerShown: false,
                 }}
-            />
+                tabBar={(props) => <AppTabBar {...props} />}
+            >
+                <Tabs.Screen
+                    name="index"
+                    options={{
+                        href: null,
+                    }}
+                />
 
-            <Tabs.Screen name="home" />
-            <Tabs.Screen name="qna" />
-            <Tabs.Screen name="report" />
-            <Tabs.Screen name="profile" />
-        </Tabs>
+                <Tabs.Screen name="home" />
+                <Tabs.Screen name="qna" />
+                <Tabs.Screen name="report" />
+                <Tabs.Screen name="profile" />
+            </Tabs>
+        </AppStateProvider>
     );
 }
