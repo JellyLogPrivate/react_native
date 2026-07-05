@@ -1,5 +1,5 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import React from 'react';
+import type { FC } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgProps } from 'react-native-svg';
@@ -13,14 +13,14 @@ import { s } from '@/ui/units';
 
 const TAB_HEIGHT = s(62);
 
-const iconMap: Record<string, React.FC<SvgProps>> = {
+const iconMap: Record<string, FC<SvgProps>> = {
     home: HomeTab,
     qna: QnaTab,
     report: ReportTab,
     profile: ProfileTab,
 };
 
-export function CustomTabBar({ state, navigation }: BottomTabBarProps) {
+export function AppTabBar({ state, navigation }: BottomTabBarProps) {
     const insets = useSafeAreaInsets();
 
     const bottomInset = Math.max(insets.bottom, s(8));
