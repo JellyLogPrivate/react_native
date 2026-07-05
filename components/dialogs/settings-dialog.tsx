@@ -1,9 +1,11 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { DialogCloseButton } from '@/components/dialogs/dialog-close-button';
 import { DefaultTheme } from '@/constants/theme';
 import { useAppState } from '@/contexts/app-state-context';
+import { useAuth } from '@/contexts/auth-context';
 import { rem, s } from '@/ui/units';
 
 type SettingsDialogProps = {
@@ -12,7 +14,14 @@ type SettingsDialogProps = {
 };
 
 export function SettingsDialog({ visible, onClose }: SettingsDialogProps) {
-    const { settings, toggleSetting } = useAppState();
+    const { nickname, settings, toggleSetting } = useAppState();
+    const { signOut } = useAuth();
+
+    const handleLogout = async () => {
+        onClose();
+        await signOut();
+        router.replace('/');
+    };
 
     return (
         <Modal
@@ -30,7 +39,7 @@ export function SettingsDialog({ visible, onClose }: SettingsDialogProps) {
 
                     <View style={styles.nicknameRow}>
                         <Text style={styles.nicknameLabel}>별명</Text>
-                        <Text style={styles.nicknameValue}>사용자</Text>
+                        <Text style={styles.nicknameValue}>{nickname}</Text>
 
                         <MaterialCommunityIcons
                             name="pencil-outline"
@@ -45,20 +54,24 @@ export function SettingsDialog({ visible, onClose }: SettingsDialogProps) {
                             type="notification"
                             value={settings.notificationEnabled}
                             onToggle={() =>
-                                toggleSetting('notificationEnabled')
+                                void toggleSetting('notificationEnabled')
                             }
                         />
                         <SettingRow
                             label="소리 설정"
                             type="sound"
                             value={settings.soundEnabled}
-                            onToggle={() => toggleSetting('soundEnabled')}
+                            onToggle={() =>
+                                void toggleSetting('soundEnabled')
+                            }
                         />
                         <SettingRow
                             label="메일 송신"
                             type="email"
                             value={settings.emailEnabled}
-                            onToggle={() => toggleSetting('emailEnabled')}
+                            onToggle={() =>
+                                void toggleSetting('emailEnabled')
+                            }
                         />
                     </View>
 
@@ -68,7 +81,10 @@ export function SettingsDialog({ visible, onClose }: SettingsDialogProps) {
                         <DialogLink label="문의" />
                     </View>
 
-                    <Pressable accessibilityRole="button">
+                    <Pressable
+                        accessibilityRole="button"
+                        onPress={() => void handleLogout()}
+                    >
                         <Text style={styles.logoutText}>로그아웃</Text>
                     </Pressable>
                 </View>

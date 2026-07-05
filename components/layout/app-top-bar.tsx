@@ -7,15 +7,14 @@ import Setting from '@/assets/images/Setting.svg';
 import { AttendanceDialog } from '@/components/dialogs/attendance-dialog';
 import { SettingsDialog } from '@/components/dialogs/settings-dialog';
 import { DefaultTheme } from '@/constants/theme';
+import { useAppState } from '@/contexts/app-state-context';
 import { rem, s } from '@/ui/units';
 
-type AppTopBarProps = {
-    points?: string;
-};
-
-export function AppTopBar({ points = '11,205 P' }: AppTopBarProps) {
+export function AppTopBar() {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const { points } = useAppState();
+    const displayPoints = Number.isFinite(points) ? points : 0;
 
     return (
         <>
@@ -25,7 +24,9 @@ export function AppTopBar({ points = '11,205 P' }: AppTopBarProps) {
                         <Point width={s(30)} height={s(21)} />
                     </View>
 
-                    <Text style={styles.pointText}>{points}</Text>
+                    <Text style={styles.pointText}>
+                        {displayPoints.toLocaleString()} P
+                    </Text>
                 </View>
 
                 <TopBarButton

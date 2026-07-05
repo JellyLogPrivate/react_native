@@ -6,9 +6,12 @@ import Tuna from '@/assets/images/tuna.svg';
 import { AppTopBar } from '@/components/layout/app-top-bar';
 import { CatRoomScene } from '@/components/layout/cat-room-scene';
 import { DefaultTheme } from '@/constants/theme';
+import { useAppState } from '@/contexts/app-state-context';
 import { rem, s } from '@/ui/units';
 
 export default function HomeScreen() {
+    const { foodQuantities } = useAppState();
+
     return (
         <View style={styles.container}>
             <CatRoomScene />
@@ -28,16 +31,19 @@ export default function HomeScreen() {
                 </View>
 
                 <View style={styles.productList}>
-                    <ProductCard />
-                    <ProductCard />
-                    <ProductCard />
+                    {[0, 1, 2].map((index) => (
+                        <ProductCard
+                            key={index}
+                            quantity={foodQuantities[index] ?? 0}
+                        />
+                    ))}
                 </View>
             </View>
         </View>
     );
 }
 
-function ProductCard() {
+function ProductCard({ quantity }: { quantity: number }) {
     return (
         <View style={styles.productCard}>
             <View style={styles.productImage}>
@@ -45,7 +51,7 @@ function ProductCard() {
             </View>
 
             <View style={styles.priceBox}>
-                <Text style={styles.priceText}>X 5</Text>
+                <Text style={styles.priceText}>X {quantity}</Text>
             </View>
         </View>
     );
@@ -158,5 +164,8 @@ const styles = StyleSheet.create({
     priceText: {
         fontSize: rem(1.45),
         fontWeight: '400',
+        lineHeight: s(22),
+        includeFontPadding: false,
+        transform: [{ translateY: s(-2) }],
     },
 });

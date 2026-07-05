@@ -19,6 +19,10 @@ export function AttendanceDialog({
     onClose,
 }: AttendanceDialogProps) {
     const { claimedRewards, claimReward } = useAppState();
+    const nextRewardIndex = claimedRewards.findIndex((claimed) => !claimed);
+    const isFinalRewardAvailable = claimedRewards
+        .slice(0, REWARDS.length)
+        .every(Boolean);
 
     return (
         <Modal
@@ -44,13 +48,13 @@ export function AttendanceDialog({
                                 key={`${point}-${index}`}
                                 point={point}
                                 claimed={Boolean(claimedRewards[index])}
-                                available={index === 1}
-                                onPress={() => claimReward(index)}
+                                available={index === nextRewardIndex}
+                                onPress={() => void claimReward(index)}
                             />
                         ))}
                     </View>
 
-                    <FinalRewardCard />
+                    <FinalRewardCard available={isFinalRewardAvailable} />
                 </View>
             </View>
         </Modal>
@@ -96,9 +100,14 @@ function RewardCard({
     );
 }
 
-function FinalRewardCard() {
+function FinalRewardCard({ available }: { available: boolean }) {
     return (
-        <View style={styles.finalRewardCard}>
+        <View
+            style={[
+                styles.finalRewardCard,
+                available && styles.availableFinalRewardCard,
+            ]}
+        >
             <View style={styles.finalRewardContent}>
                 <View style={styles.finalRewardItem}>
                     <Text style={styles.rewardPoint}>500 P</Text>
@@ -113,7 +122,7 @@ function FinalRewardCard() {
                 </View>
             </View>
 
-            <RewardAction label="수령" />
+            <RewardAction label={available ? '수령' : '수령 불가'} />
         </View>
     );
 }
@@ -244,6 +253,10 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
 
         backgroundColor: DefaultTheme.sub2_2Color,
+    },
+
+    availableFinalRewardCard: {
+        backgroundColor: DefaultTheme.main2Color,
     },
 
     finalRewardContent: {

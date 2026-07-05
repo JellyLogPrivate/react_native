@@ -10,22 +10,26 @@ import { StatusBar } from 'expo-status-bar';
 
 import 'react-native-reanimated';
 
+import { AuthProvider } from '@/contexts/auth-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function RootLayout() {
     const colorScheme = useColorScheme();
 
     return (
-        <ThemeProvider
-            value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-        >
-            <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="index" />
-                <Stack.Screen name="loading" />
-                <Stack.Screen name="(tabs)" />
-            </Stack>
+        <AuthProvider>
+            <ThemeProvider
+                value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+            >
+                <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="index" />
+                    <Stack.Screen name="auth" />
+                    <Stack.Screen name="loading" />
+                    <Stack.Screen name="(tabs)" />
+                </Stack>
 
-            <StatusBar style="auto" />
-        </ThemeProvider>
+                <StatusBar style="auto" />
+            </ThemeProvider>
+        </AuthProvider>
     );
 }

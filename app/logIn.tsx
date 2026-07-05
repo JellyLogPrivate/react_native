@@ -1,6 +1,14 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useEffect } from 'react';
+import {
+    ActivityIndicator,
+    Image,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
+} from 'react-native';
 
 import Cat from '@/assets/images/cat.png';
 import Cushion from '@/assets/images/cushion.svg';
@@ -9,9 +17,30 @@ import Google from '@/assets/images/google.svg';
 import Logo from '@/assets/images/logo.svg';
 import Paw from '@/components/paw';
 import { DefaultTheme } from '@/constants/theme';
+import { useAuth } from '@/contexts/auth-context';
 import { rem, s } from '@/ui/units';
 
 export default function LoginScreen() {
+    const {
+        errorMessage,
+        isAuthenticated,
+        isRestoring,
+        isSigningIn,
+        signInWithGoogle,
+    } = useAuth();
+
+    useEffect(() => {
+        if (!isRestoring && isAuthenticated) {
+            router.replace('/home');
+        }
+    }, [isAuthenticated, isRestoring]);
+
+    const handleGoogleLogin = async () => {
+        if (await signInWithGoogle()) {
+            router.replace('/home');
+        }
+    };
+
     return (
         <View style={styles.container}>
             <Logo width={s(292)} height={s(100)} style={styles.logo} />
@@ -39,12 +68,26 @@ export default function LoginScreen() {
             <Image source={Cat} style={styles.cat} resizeMode="contain" />
 
             <Pressable
-                style={styles.googleButton}
-                onPress={() => router.push('/loading')}
+                disabled={isRestoring || isSigningIn}
+                style={({ pressed }) => [
+                    styles.googleButton,
+                    pressed && styles.pressed,
+                ]}
+                onPress={() => void handleGoogleLogin()}
             >
-                <Text style={styles.googleText}>Start with google</Text>
-                <Google width={s(32)} height={s(32)} />
+                {isRestoring || isSigningIn ? (
+                    <ActivityIndicator color={DefaultTheme.sub2Color} />
+                ) : (
+                    <>
+                        <Text style={styles.googleText}>Start with google</Text>
+                        <Google width={s(32)} height={s(32)} />
+                    </>
+                )}
             </Pressable>
+
+            {errorMessage ? (
+                <Text style={styles.errorText}>{errorMessage}</Text>
+            ) : null}
         </View>
     );
 }
@@ -108,6 +151,22 @@ const styles = StyleSheet.create({
         fontSize: rem(1.5),
         fontWeight: '700',
         color: DefaultTheme.sub2Color,
+    },
+
+    errorText: {
+        position: 'absolute',
+        top: s(810),
+
+        width: s(330),
+
+        textAlign: 'center',
+
+        fontSize: rem(0.85),
+        color: '#B94A48',
+    },
+
+    pressed: {
+        opacity: 0.65,
     },
 
     divider: {

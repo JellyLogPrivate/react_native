@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
     Keyboard,
     Pressable,
@@ -12,42 +13,86 @@ import { AppTopBar } from '@/components/layout/app-top-bar';
 import { CatRoomScene } from '@/components/layout/cat-room-scene';
 import Paw from '@/components/paw';
 import { DefaultTheme } from '@/constants/theme';
+import { useAppState } from '@/contexts/app-state-context';
 import { rem, s } from '@/ui/units';
 
-const QUESTION = 'Q. 오늘은 행복한 하루였나요?';
+const QUESTION = 'Q. 질문을 불러오는 중이에요.';
 const COMPLETED_QUESTION = 'Q. 오늘도 답해줘서 고마워요!';
 const COMPLETED_ANSWER = '이미 오늘의 질문에 답변하였습니다.';
 
 export default function QNAScreen() {
     const [answer, setAnswer] = useState('');
-    const [isCompleted, setIsCompleted] = useState(false);
-    const handleSubmit = () => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const {
+        errorMessage,
+        isQuestionLoading,
+        loadQuestion,
+        question,
+        submitAnswer,
+    } = useAppState();
+    const isCompleted = Boolean(question?.isAnswered);
+
+    useFocusEffect(
+        useCallback(() => {
+            if (!question && !isQuestionLoading) {
+                void loadQuestion();
+            }
+        }, [isQuestionLoading, loadQuestion, question])
+    );
+
+    const handleSubmit = async () => {
+        if (isSubmitting || isCompleted || !answer.trim()) return;
+
         Keyboard.dismiss();
-        setIsCompleted(true);
+        setIsSubmitting(true);
+
+        try {
+            await submitAnswer(answer.trim());
+            setAnswer('');
+        } catch {
+            // Error state is exposed by AppStateProvider.
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
         <View style={styles.container}>
-            <QuestionCard isCompleted={isCompleted} />
+            <QuestionCard
+                isCompleted={isCompleted}
+                isLoading={isQuestionLoading}
+                question={question?.questionContent}
+            />
             <CatRoomScene />
 
             <AnswerPanel
                 answer={answer}
                 isCompleted={isCompleted}
+                isSubmitting={isSubmitting}
                 onAnswerChange={setAnswer}
                 onSubmit={handleSubmit}
             />
+
+            {errorMessage ? (
+                <Text style={styles.errorText}>{errorMessage}</Text>
+            ) : null}
 
             <AppTopBar />
         </View>
     );
 }
 
-function QuestionCard({ isCompleted }: { isCompleted: boolean }) {
+type QuestionCardProps = {
+    isCompleted: boolean;
+    isLoading: boolean;
+    question?: string;
+};
+
+function QuestionCard({ isCompleted, isLoading, question }: QuestionCardProps) {
     return (
         <View style={styles.questionCard}>
             <Text style={styles.questionText}>
-                {isCompleted ? COMPLETED_QUESTION : QUESTION}
+                {getQuestionText({ isCompleted, isLoading, question })}
             </Text>
 
             <View style={styles.questionPaw}>
@@ -65,13 +110,15 @@ function QuestionCard({ isCompleted }: { isCompleted: boolean }) {
 type AnswerPanelProps = {
     answer: string;
     isCompleted: boolean;
+    isSubmitting: boolean;
     onAnswerChange: (answer: string) => void;
-    onSubmit: () => void;
+    onSubmit: () => Promise<void>;
 };
 
 function AnswerPanel({
     answer,
     isCompleted,
+    isSubmitting,
     onAnswerChange,
     onSubmit,
 }: AnswerPanelProps) {
@@ -79,15 +126,17 @@ function AnswerPanel({
         <View style={styles.answerPanel}>
             <Pressable
                 accessibilityRole="button"
-                accessibilityState={{ disabled: isCompleted }}
-                disabled={isCompleted}
+                accessibilityState={{ disabled: isCompleted || isSubmitting }}
+                disabled={isCompleted || isSubmitting}
                 style={({ pressed }) => [
                     styles.submitButton,
                     pressed && styles.submitButtonPressed,
                 ]}
                 onPress={onSubmit}
             >
-                <Text style={styles.submitText}>답하기</Text>
+                <Text style={styles.submitText}>
+                    {isSubmitting ? '전송 중' : '답하기'}
+                </Text>
 
                 <Paw
                     width={s(28)}
@@ -246,4 +295,36 @@ const styles = StyleSheet.create({
     completedAnswerInput: {
         color: DefaultTheme.sub2Color,
     },
+
+    errorText: {
+        position: 'absolute',
+        left: s(28),
+        right: s(28),
+        bottom: s(18),
+        zIndex: 6,
+
+        textAlign: 'center',
+        fontSize: rem(0.9),
+        color: '#B94A48',
+    },
 });
+
+function getQuestionText({
+    isCompleted,
+    isLoading,
+    question,
+}: {
+    isCompleted: boolean;
+    isLoading: boolean;
+    question?: string;
+}) {
+    if (isCompleted) return COMPLETED_QUESTION;
+    if (question) return formatQuestion(question);
+    if (isLoading) return QUESTION;
+
+    return QUESTION;
+}
+
+function formatQuestion(question: string) {
+    return question.trim().startsWith('Q.') ? question : `Q. ${question}`;
+}
