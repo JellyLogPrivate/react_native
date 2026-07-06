@@ -14,6 +14,7 @@ export const isApiConfigured = Boolean(API_BASE_URL);
 
 type ApiRequestOptions = RequestInit & {
     authenticated?: boolean;
+    timeout?: number;
 };
 
 export class ApiError extends Error {
@@ -40,7 +41,7 @@ export async function apiRequest<T>(
         throw new ApiError('EXPO_PUBLIC_API_BASE_URL이 설정되지 않았습니다.', 0);
     }
 
-    const { authenticated = true, headers, ...requestOptions } = options;
+    const { authenticated = true, headers, timeout, ...requestOptions } = options;
     const method = requestOptions.method ?? 'GET';
     const url = `${API_BASE_URL}${normalizeEndpoint(endpoint)}`;
     console.info(`[API] ${method} ${url}`);
@@ -60,7 +61,7 @@ export async function apiRequest<T>(
                 : {}),
             ...headers,
         },
-    });
+    }, timeout);
     console.info(`[API] ${response.status} ${method} ${url}`);
 
     if (authenticated && session && response.status === 401) {
@@ -114,9 +115,9 @@ function getDevelopmentAccessToken() {
     return token;
 }
 
-async function fetchWithTimeout(url: string, options: RequestInit) {
+async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = 10000) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
         return await fetch(url, {
