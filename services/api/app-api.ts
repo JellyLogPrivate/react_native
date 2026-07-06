@@ -361,6 +361,7 @@ export const appApi = {
 
         return apiRequest<AiReport>(endpoint, {
             method: 'POST',
+            timeout: 60000,
         });
     },
 
